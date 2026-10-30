@@ -1,0 +1,16 @@
+.venv/
+.venv_*/
+__pycache__/
+*.py[cod]
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+build/
+logs/
+*.log
+*.sql
+refresh-backup-*/
+.DS_Store
+.vscode/

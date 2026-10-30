@@ -1,0 +1,64 @@
+﻿from rest_framework import generics, permissions
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.filters import SearchFilter, OrderingFilter
+from django.utils import timezone
+
+from .models import Lead
+from .serializers import LeadSerializer
+
+
+class LeadListCreateView(generics.ListCreateAPIView):
+    serializer_class = LeadSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [SearchFilter, OrderingFilter]
+    search_fields = ["name", "email", "phone", "company"]
+    ordering_fields = ["created_at", "updated_at", "estimated_value"]
+    ordering = ["-created_at"]
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Lead.objects.select_related("assigned_to", "created_by")
+
+        if user.is_superuser or user.role in ["ADMIN", "MANAGER"]:
+            pass
+        else:
+            queryset = queryset.filter(
+                models_Q_created_by_or_assigned_to(user)
+            )
+
+        status = self.request.query_params.get("status")
+        priority = self.request.query_params.get("priority")
+        source = self.request.query_params.get("source")
+
+        if status:
+            queryset = queryset.filter(status=status)
+        if priority:
+            queryset = queryset.filter(priority=priority)
+        if source:
+            queryset = queryset.filter(source=source)
+
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
+
+class LeadDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = LeadSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Lead.objects.select_related("assigned_to", "created_by")
+
+        if user.is_superuser or user.role in ["ADMIN", "MANAGER"]:
+            return queryset
+
+        return queryset.filter(
+            models_Q_created_by_or_assigned_to(user)
+        )
+
+
+def models_Q_created_by_or_assigned_to(user):
+    from django.db.models import Q
+    return Q(created_by=user) | Q(assigned_to=user)

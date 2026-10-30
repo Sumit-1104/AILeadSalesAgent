@@ -1,0 +1,225 @@
+
+import logging
+
+from django.db.models import Q
+from django.utils import timezone
+from rest_framework import serializers
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.viewsets import ModelViewSet
+
+from apps.ai_agent.services import (
+    AIConfigurationError,
+    AIProviderError,
+    generate_ai_json,
+)
+from .models import Conversation, Message
+from .serializers import ConversationSerializer, MessageSerializer
+
+logger = logging.getLogger(__name__)
+
+
+def is_manager(user):
+    return user.is_superuser or getattr(user, "role", "") in ("ADMIN", "MANAGER")
+
+
+class ConversationViewSet(ModelViewSet):
+    serializer_class = ConversationSerializer
+    permission_classes = [IsAuthenticated]
+    search_fields = ["subject", "external_contact", "channel"]
+    ordering_fields = ["created_at", "last_message_at", "status"]
+
+    def get_queryset(self):
+        qs = Conversation.objects.select_related(
+            "lead", "customer", "assigned_to", "created_by"
+        )
+        user = self.request.user
+
+        if is_manager(user):
+            return qs
+
+        return qs.filter(
+            Q(created_by=user)
+            | Q(assigned_to=user)
+            | Q(lead__created_by=user)
+            | Q(lead__assigned_to=user)
+            | Q(customer__created_by=user)
+            | Q(customer__assigned_to=user)
+        ).distinct()
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
+
+class MessageViewSet(ModelViewSet):
+    serializer_class = MessageSerializer
+    permission_classes = [IsAuthenticated]
+    http_method_names = ["get", "post", "head", "options"]
+
+    def get_queryset(self):
+        user = self.request.user
+        qs = Message.objects.select_related("conversation")
+
+        conversations = Conversation.objects.all()
+
+        if not is_manager(user):
+            conversations = conversations.filter(
+                Q(created_by=user)
+                | Q(assigned_to=user)
+                | Q(lead__created_by=user)
+                | Q(lead__assigned_to=user)
+                | Q(customer__created_by=user)
+                | Q(customer__assigned_to=user)
+            ).distinct()
+
+        conversation_pk = self.kwargs.get("conversation_pk")
+        if conversation_pk is not None:
+            conversations = conversations.filter(pk=conversation_pk)
+
+        return qs.filter(conversation__in=conversations)
+
+    def perform_create(self, serializer):
+        conversation_pk = self.kwargs.get("conversation_pk")
+        user = self.request.user
+
+        conversation = Conversation.objects.filter(
+            pk=conversation_pk
+        ).first()
+
+        if conversation is None:
+            raise serializers.ValidationError(
+                {"conversation": "Conversation not found."}
+            )
+
+        if not is_manager(user):
+            has_access = Conversation.objects.filter(
+                pk=conversation.pk
+            ).filter(
+                Q(created_by=user)
+                | Q(assigned_to=user)
+                | Q(lead__created_by=user)
+                | Q(lead__assigned_to=user)
+                | Q(customer__created_by=user)
+                | Q(customer__assigned_to=user)
+            ).exists()
+
+            if not has_access:
+                raise serializers.ValidationError(
+                    {"conversation": "You do not have access to this conversation."}
+                )
+
+        # Save the original message first.
+        message = serializer.save()
+        Conversation.objects.filter(pk=conversation.pk).update(
+            last_message_at=message.sent_at or timezone.now()
+        )
+
+        # Never generate an AI reply to another AI reply or a system message.
+        if message.sender_type in (
+            Message.SenderType.AI,
+            Message.SenderType.SYSTEM,
+        ):
+            return
+
+        recent_messages = list(
+            Message.objects.filter(conversation=conversation)
+            .exclude(pk=message.pk)
+            .order_by("-sent_at", "-id")[:10]
+        )
+        recent_messages.reverse()
+
+        history = [
+            {
+                "sender": item.sender_type,
+                "direction": item.direction,
+                "message": item.body,
+            }
+            for item in recent_messages
+        ]
+        history.append(
+            {
+                "sender": message.sender_type,
+                "direction": message.direction,
+                "message": message.body,
+            }
+        )
+
+        lead_info = None
+        if conversation.lead_id:
+            lead = conversation.lead
+            lead_info = {
+                "name": str(lead),
+            }
+
+        customer_info = None
+        if conversation.customer_id:
+            customer_info = {
+                "name": str(conversation.customer),
+            }
+
+        task = """
+You are the AI sales assistant inside a business CRM.
+Reply naturally and helpfully to the latest message in the conversation.
+Always respond in natural, professional English, regardless of the language used by the client.
+Use the conversation history and lead/customer information as context.
+Never invent product prices, availability, discounts, policies, or promises.
+If essential details are missing, ask a short clarifying question.
+Return valid JSON with these keys:
+- reply: the message to display as the AI response
+- rationale: a brief internal explanation
+- suggested_next_step: a concise recommended sales action
+"""
+
+        try:
+            result = generate_ai_json(
+                task,
+                {
+                    "conversation": {
+                        "channel": conversation.channel,
+                        "subject": conversation.subject,
+                        "contact": conversation.external_contact,
+                    },
+                    "lead": lead_info,
+                    "customer": customer_info,
+                    "recent_messages": history,
+                    "latest_message": message.body,
+                },
+            )
+
+            reply = result.get("reply", "")
+            if not isinstance(reply, str) or not reply.strip():
+                raise AIProviderError("The AI provider returned an empty reply.")
+
+            Message.objects.create(
+                conversation=conversation,
+                sender_type=Message.SenderType.AI,
+                direction=Message.Direction.OUTBOUND,
+                body=reply.strip(),
+                metadata={
+                    "rationale": str(result.get("rationale", "")),
+                    "suggested_next_step": str(
+                        result.get("suggested_next_step", "")
+                    ),
+                },
+                sent_at=timezone.now(),
+            )
+
+            Conversation.objects.filter(pk=conversation.pk).update(
+                last_message_at=timezone.now()
+            )
+
+        except (AIConfigurationError, AIProviderError):
+            logger.exception(
+                "AI reply generation failed for conversation %s",
+                conversation.pk,
+            )
+            Message.objects.create(
+                conversation=conversation,
+                sender_type=Message.SenderType.SYSTEM,
+                direction=Message.Direction.OUTBOUND,
+                body="AI reply could not be generated right now. Please try again.",
+                metadata={"error": "AI_REPLY_FAILED"},
+                sent_at=timezone.now(),
+            )
+            Conversation.objects.filter(pk=conversation.pk).update(
+                last_message_at=timezone.now()
+            )

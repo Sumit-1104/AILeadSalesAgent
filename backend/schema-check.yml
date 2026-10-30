@@ -1,0 +1,2559 @@
+openapi: 3.0.3
+info:
+  title: AI Lead Sales Agent API
+  version: 1.0.0
+  description: Lead management and AI-assisted sales automation API
+paths:
+  /api/ai/generate-reply/:
+    post:
+      operationId: ai_generate_reply_create
+      tags:
+      - ai
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateReplyRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GenerateReplyRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GenerateReplyRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/ai/qualify-lead/:
+    post:
+      operationId: ai_qualify_lead_create
+      tags:
+      - ai
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeadAIRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeadAIRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeadAIRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/ai/score-lead/:
+    post:
+      operationId: ai_score_lead_create
+      tags:
+      - ai
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeadAIRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LeadAIRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LeadAIRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/ai/suggest-followup/:
+    post:
+      operationId: ai_suggest_followup_create
+      tags:
+      - ai
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SuggestFollowupRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SuggestFollowupRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SuggestFollowupRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/appointments/:
+    get:
+      operationId: appointments_list
+      tags:
+      - appointments
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Appointment'
+          description: ''
+    post:
+      operationId: appointments_create
+      tags:
+      - appointments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Appointment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Appointment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Appointment'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+          description: ''
+  /api/appointments/{id}/:
+    get:
+      operationId: appointments_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - appointments
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+          description: ''
+    put:
+      operationId: appointments_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - appointments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Appointment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Appointment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Appointment'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+          description: ''
+    patch:
+      operationId: appointments_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - appointments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAppointment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAppointment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAppointment'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+          description: ''
+    delete:
+      operationId: appointments_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - appointments
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/auth/me/:
+    get:
+      operationId: auth_me_retrieve
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+    patch:
+      operationId: auth_me_partial_update
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/auth/token/:
+    post:
+      operationId: auth_token_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenObtainPair'
+          description: ''
+  /api/auth/token/refresh/:
+    post:
+      operationId: auth_token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/conversations/:
+    get:
+      operationId: conversations_list
+      tags:
+      - conversations
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Conversation'
+          description: ''
+    post:
+      operationId: conversations_create
+      tags:
+      - conversations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Conversation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Conversation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Conversation'
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+          description: ''
+  /api/conversations/{conversation_pk}/messages/:
+    get:
+      operationId: conversations_messages_list
+      parameters:
+      - in: path
+        name: conversation_pk
+        schema:
+          type: integer
+        required: true
+      tags:
+      - conversations
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+          description: ''
+    post:
+      operationId: conversations_messages_create
+      parameters:
+      - in: path
+        name: conversation_pk
+        schema:
+          type: integer
+        required: true
+      tags:
+      - conversations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Message'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Message'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: ''
+  /api/conversations/{conversation_pk}/messages/{id}/:
+    get:
+      operationId: conversations_messages_retrieve
+      parameters:
+      - in: path
+        name: conversation_pk
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - conversations
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: ''
+  /api/conversations/{id}/:
+    get:
+      operationId: conversations_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - conversations
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+          description: ''
+    put:
+      operationId: conversations_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - conversations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Conversation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Conversation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Conversation'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+          description: ''
+    patch:
+      operationId: conversations_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - conversations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedConversation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedConversation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedConversation'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+          description: ''
+    delete:
+      operationId: conversations_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - conversations
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/customers/:
+    get:
+      operationId: customers_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - customers
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Customer'
+          description: ''
+    post:
+      operationId: customers_create
+      tags:
+      - customers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Customer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Customer'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+          description: ''
+  /api/customers/{id}/:
+    get:
+      operationId: customers_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - customers
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+          description: ''
+    put:
+      operationId: customers_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - customers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Customer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Customer'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+          description: ''
+    patch:
+      operationId: customers_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - customers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCustomer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCustomer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCustomer'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+          description: ''
+    delete:
+      operationId: customers_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - customers
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/followups/:
+    get:
+      operationId: followups_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - followups
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FollowUp'
+          description: ''
+    post:
+      operationId: followups_create
+      tags:
+      - followups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FollowUp'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FollowUp'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FollowUp'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FollowUp'
+          description: ''
+  /api/followups/{id}/:
+    get:
+      operationId: followups_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - followups
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FollowUp'
+          description: ''
+    put:
+      operationId: followups_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - followups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FollowUp'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FollowUp'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FollowUp'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FollowUp'
+          description: ''
+    patch:
+      operationId: followups_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - followups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedFollowUp'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedFollowUp'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedFollowUp'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FollowUp'
+          description: ''
+    delete:
+      operationId: followups_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - followups
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/leads/:
+    get:
+      operationId: leads_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - leads
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Lead'
+          description: ''
+    post:
+      operationId: leads_create
+      tags:
+      - leads
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Lead'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Lead'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Lead'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+          description: ''
+  /api/leads/{id}/:
+    get:
+      operationId: leads_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - leads
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+          description: ''
+    put:
+      operationId: leads_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - leads
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Lead'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Lead'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Lead'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+          description: ''
+    patch:
+      operationId: leads_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - leads
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLead'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLead'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLead'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+          description: ''
+    delete:
+      operationId: leads_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - leads
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/notifications/:
+    get:
+      operationId: notifications_list
+      tags:
+      - notifications
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+          description: ''
+  /api/notifications/{id}/:
+    get:
+      operationId: notifications_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - notifications
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+          description: ''
+    patch:
+      operationId: notifications_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - notifications
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedNotification'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedNotification'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedNotification'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+          description: ''
+  /api/products/:
+    get:
+      operationId: products_list
+      tags:
+      - products
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+          description: ''
+    post:
+      operationId: products_create
+      tags:
+      - products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Product'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Product'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+  /api/products/{id}/:
+    get:
+      operationId: products_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this product.
+        required: true
+      tags:
+      - products
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+    put:
+      operationId: products_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this product.
+        required: true
+      tags:
+      - products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Product'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Product'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+    patch:
+      operationId: products_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this product.
+        required: true
+      tags:
+      - products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProduct'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProduct'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProduct'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+    delete:
+      operationId: products_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this product.
+        required: true
+      tags:
+      - products
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/quotations/:
+    get:
+      operationId: quotations_list
+      tags:
+      - quotations
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Quotation'
+          description: ''
+    post:
+      operationId: quotations_create
+      tags:
+      - quotations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Quotation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Quotation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Quotation'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quotation'
+          description: ''
+  /api/quotations/{id}/:
+    get:
+      operationId: quotations_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - quotations
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quotation'
+          description: ''
+    put:
+      operationId: quotations_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - quotations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Quotation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Quotation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Quotation'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quotation'
+          description: ''
+    patch:
+      operationId: quotations_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - quotations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedQuotation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedQuotation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedQuotation'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quotation'
+          description: ''
+    delete:
+      operationId: quotations_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - quotations
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/schema/:
+    get:
+      operationId: schema_retrieve
+      description: |-
+        OpenApi3 schema for this API. Format can be selected via content negotiation.
+
+        - YAML: application/vnd.oai.openapi
+        - JSON: application/vnd.oai.openapi+json
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - yaml
+      - in: query
+        name: lang
+        schema:
+          type: string
+          enum:
+          - af
+          - ar
+          - ar-dz
+          - ast
+          - az
+          - be
+          - bg
+          - bn
+          - br
+          - bs
+          - ca
+          - ckb
+          - cs
+          - cy
+          - da
+          - de
+          - dsb
+          - el
+          - en
+          - en-au
+          - en-gb
+          - eo
+          - es
+          - es-ar
+          - es-co
+          - es-mx
+          - es-ni
+          - es-ve
+          - et
+          - eu
+          - fa
+          - fi
+          - fr
+          - fy
+          - ga
+          - gd
+          - gl
+          - he
+          - hi
+          - hr
+          - hsb
+          - hu
+          - hy
+          - ia
+          - id
+          - ig
+          - io
+          - is
+          - it
+          - ja
+          - ka
+          - kab
+          - kk
+          - km
+          - kn
+          - ko
+          - ky
+          - lb
+          - lt
+          - lv
+          - mk
+          - ml
+          - mn
+          - mr
+          - ms
+          - my
+          - nb
+          - ne
+          - nl
+          - nn
+          - os
+          - pa
+          - pl
+          - pt
+          - pt-br
+          - ro
+          - ru
+          - sk
+          - sl
+          - sq
+          - sr
+          - sr-latn
+          - sv
+          - sw
+          - ta
+          - te
+          - tg
+          - th
+          - tk
+          - tr
+          - tt
+          - udm
+          - ug
+          - uk
+          - ur
+          - uz
+          - vi
+          - zh-hans
+          - zh-hant
+      tags:
+      - schema
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.oai.openapi:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/yaml:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/vnd.oai.openapi+json:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+components:
+  schemas:
+    Appointment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 180
+        description:
+          type: string
+        starts_at:
+          type: string
+          format: date-time
+        ends_at:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/AppointmentStatusEnum'
+        location:
+          type: string
+          maxLength: 255
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        lead:
+          type: integer
+          nullable: true
+        customer:
+          type: integer
+          nullable: true
+        assigned_to:
+          type: integer
+          nullable: true
+        created_by:
+          type: integer
+          readOnly: true
+          nullable: true
+      required:
+      - created_at
+      - created_by
+      - ends_at
+      - id
+      - starts_at
+      - title
+      - updated_at
+    AppointmentStatusEnum:
+      enum:
+      - SCHEDULED
+      - COMPLETED
+      - CANCELLED
+      - NO_SHOW
+      type: string
+      description: |-
+        * `SCHEDULED` - Scheduled
+        * `COMPLETED` - Completed
+        * `CANCELLED` - Cancelled
+        * `NO_SHOW` - No show
+    ChannelEnum:
+      enum:
+      - WEBSITE
+      - WHATSAPP
+      - INSTAGRAM
+      - EMAIL
+      - PHONE
+      - OTHER
+      type: string
+      description: |-
+        * `WEBSITE` - Website
+        * `WHATSAPP` - WhatsApp
+        * `INSTAGRAM` - Instagram
+        * `EMAIL` - Email
+        * `PHONE` - Phone
+        * `OTHER` - Other
+    Conversation:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        channel:
+          $ref: '#/components/schemas/ChannelEnum'
+        status:
+          $ref: '#/components/schemas/ConversationStatusEnum'
+        subject:
+          type: string
+          maxLength: 200
+        external_contact:
+          type: string
+          maxLength: 180
+        started_at:
+          type: string
+          format: date-time
+          readOnly: true
+        last_message_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        lead:
+          type: integer
+          nullable: true
+        customer:
+          type: integer
+          nullable: true
+        assigned_to:
+          type: integer
+          nullable: true
+        created_by:
+          type: integer
+          readOnly: true
+          nullable: true
+      required:
+      - created_at
+      - created_by
+      - id
+      - last_message_at
+      - started_at
+      - updated_at
+    ConversationStatusEnum:
+      enum:
+      - OPEN
+      - WAITING
+      - CLOSED
+      type: string
+      description: |-
+        * `OPEN` - Open
+        * `WAITING` - Waiting
+        * `CLOSED` - Closed
+    Customer:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        assigned_to_username:
+          type: string
+          readOnly: true
+        created_by_username:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        customer_type:
+          $ref: '#/components/schemas/CustomerTypeEnum'
+        email:
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        phone:
+          type: string
+          maxLength: 20
+        company:
+          type: string
+          maxLength: 200
+        address:
+          type: string
+        city:
+          type: string
+          maxLength: 100
+        state:
+          type: string
+          maxLength: 100
+        country:
+          type: string
+          maxLength: 100
+        notes:
+          type: string
+        status:
+          $ref: '#/components/schemas/CustomerStatusEnum'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        linked_lead:
+          type: integer
+          nullable: true
+        assigned_to:
+          type: integer
+          nullable: true
+        created_by:
+          type: integer
+          readOnly: true
+          nullable: true
+      required:
+      - assigned_to_username
+      - created_at
+      - created_by
+      - created_by_username
+      - id
+      - name
+      - phone
+      - updated_at
+    CustomerStatusEnum:
+      enum:
+      - ACTIVE
+      - INACTIVE
+      type: string
+      description: |-
+        * `ACTIVE` - Active
+        * `INACTIVE` - Inactive
+    CustomerTypeEnum:
+      enum:
+      - INDIVIDUAL
+      - BUSINESS
+      type: string
+      description: |-
+        * `INDIVIDUAL` - Individual
+        * `BUSINESS` - Business
+    DirectionEnum:
+      enum:
+      - INBOUND
+      - OUTBOUND
+      type: string
+      description: |-
+        * `INBOUND` - Inbound
+        * `OUTBOUND` - Outbound
+    FollowUp:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        assigned_to_username:
+          type: string
+          readOnly: true
+        created_by_username:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        follow_up_type:
+          $ref: '#/components/schemas/FollowUpTypeEnum'
+        status:
+          $ref: '#/components/schemas/FollowUpStatusEnum'
+        due_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        lead:
+          type: integer
+          nullable: true
+        customer:
+          type: integer
+          nullable: true
+        assigned_to:
+          type: integer
+          nullable: true
+        created_by:
+          type: integer
+          readOnly: true
+          nullable: true
+      required:
+      - assigned_to_username
+      - completed_at
+      - created_at
+      - created_by
+      - created_by_username
+      - due_at
+      - id
+      - title
+      - updated_at
+    FollowUpStatusEnum:
+      enum:
+      - PENDING
+      - COMPLETED
+      - CANCELLED
+      type: string
+      description: |-
+        * `PENDING` - Pending
+        * `COMPLETED` - Completed
+        * `CANCELLED` - Cancelled
+    FollowUpTypeEnum:
+      enum:
+      - CALL
+      - EMAIL
+      - WHATSAPP
+      - MEETING
+      - OTHER
+      type: string
+      description: |-
+        * `CALL` - Call
+        * `EMAIL` - Email
+        * `WHATSAPP` - WhatsApp
+        * `MEETING` - Meeting
+        * `OTHER` - Other
+    GenerateReplyRequest:
+      type: object
+      properties:
+        context:
+          type: string
+          maxLength: 12000
+        tone:
+          type: string
+          default: professional
+          maxLength: 60
+        language:
+          type: string
+          default: English
+          maxLength: 60
+        lead_id:
+          type: integer
+      required:
+      - context
+    Lead:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        email:
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        phone:
+          type: string
+          maxLength: 20
+        company:
+          type: string
+          maxLength: 200
+        source:
+          $ref: '#/components/schemas/SourceEnum'
+        status:
+          $ref: '#/components/schemas/LeadStatusEnum'
+        priority:
+          $ref: '#/components/schemas/PriorityEnum'
+        estimated_value:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        notes:
+          type: string
+        assigned_to:
+          type: integer
+          nullable: true
+        assigned_to_username:
+          type: string
+          readOnly: true
+        created_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        created_by_username:
+          type: string
+          readOnly: true
+        next_follow_up:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - assigned_to_username
+      - created_at
+      - created_by
+      - created_by_username
+      - id
+      - name
+      - phone
+      - updated_at
+    LeadAIRequest:
+      type: object
+      properties:
+        lead_id:
+          type: integer
+      required:
+      - lead_id
+    LeadStatusEnum:
+      enum:
+      - NEW
+      - CONTACTED
+      - QUALIFIED
+      - PROPOSAL
+      - NEGOTIATION
+      - WON
+      - LOST
+      type: string
+      description: |-
+        * `NEW` - New
+        * `CONTACTED` - Contacted
+        * `QUALIFIED` - Qualified
+        * `PROPOSAL` - Proposal Sent
+        * `NEGOTIATION` - Negotiation
+        * `WON` - Won
+        * `LOST` - Lost
+    Message:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        conversation:
+          type: integer
+          readOnly: true
+        sender_type:
+          $ref: '#/components/schemas/SenderTypeEnum'
+        direction:
+          $ref: '#/components/schemas/DirectionEnum'
+        body:
+          type: string
+        external_message_id:
+          type: string
+          maxLength: 180
+        metadata: {}
+        sent_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - body
+      - conversation
+      - created_at
+      - id
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 180
+        message:
+          type: string
+        notification_type:
+          $ref: '#/components/schemas/NotificationTypeEnum'
+        link:
+          type: string
+          maxLength: 500
+        is_read:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        read_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        recipient:
+          type: integer
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - message
+      - read_at
+      - recipient
+      - title
+    NotificationTypeEnum:
+      enum:
+      - INFO
+      - SUCCESS
+      - WARNING
+      - REMINDER
+      type: string
+      description: |-
+        * `INFO` - Information
+        * `SUCCESS` - Success
+        * `WARNING` - Warning
+        * `REMINDER` - Reminder
+    PatchedAppointment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 180
+        description:
+          type: string
+        starts_at:
+          type: string
+          format: date-time
+        ends_at:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/AppointmentStatusEnum'
+        location:
+          type: string
+          maxLength: 255
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        lead:
+          type: integer
+          nullable: true
+        customer:
+          type: integer
+          nullable: true
+        assigned_to:
+          type: integer
+          nullable: true
+        created_by:
+          type: integer
+          readOnly: true
+          nullable: true
+    PatchedConversation:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        channel:
+          $ref: '#/components/schemas/ChannelEnum'
+        status:
+          $ref: '#/components/schemas/ConversationStatusEnum'
+        subject:
+          type: string
+          maxLength: 200
+        external_contact:
+          type: string
+          maxLength: 180
+        started_at:
+          type: string
+          format: date-time
+          readOnly: true
+        last_message_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        lead:
+          type: integer
+          nullable: true
+        customer:
+          type: integer
+          nullable: true
+        assigned_to:
+          type: integer
+          nullable: true
+        created_by:
+          type: integer
+          readOnly: true
+          nullable: true
+    PatchedCustomer:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        assigned_to_username:
+          type: string
+          readOnly: true
+        created_by_username:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        customer_type:
+          $ref: '#/components/schemas/CustomerTypeEnum'
+        email:
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        phone:
+          type: string
+          maxLength: 20
+        company:
+          type: string
+          maxLength: 200
+        address:
+          type: string
+        city:
+          type: string
+          maxLength: 100
+        state:
+          type: string
+          maxLength: 100
+        country:
+          type: string
+          maxLength: 100
+        notes:
+          type: string
+        status:
+          $ref: '#/components/schemas/CustomerStatusEnum'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        linked_lead:
+          type: integer
+          nullable: true
+        assigned_to:
+          type: integer
+          nullable: true
+        created_by:
+          type: integer
+          readOnly: true
+          nullable: true
+    PatchedFollowUp:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        assigned_to_username:
+          type: string
+          readOnly: true
+        created_by_username:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        follow_up_type:
+          $ref: '#/components/schemas/FollowUpTypeEnum'
+        status:
+          $ref: '#/components/schemas/FollowUpStatusEnum'
+        due_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        lead:
+          type: integer
+          nullable: true
+        customer:
+          type: integer
+          nullable: true
+        assigned_to:
+          type: integer
+          nullable: true
+        created_by:
+          type: integer
+          readOnly: true
+          nullable: true
+    PatchedLead:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        email:
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        phone:
+          type: string
+          maxLength: 20
+        company:
+          type: string
+          maxLength: 200
+        source:
+          $ref: '#/components/schemas/SourceEnum'
+        status:
+          $ref: '#/components/schemas/LeadStatusEnum'
+        priority:
+          $ref: '#/components/schemas/PriorityEnum'
+        estimated_value:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        notes:
+          type: string
+        assigned_to:
+          type: integer
+          nullable: true
+        assigned_to_username:
+          type: string
+          readOnly: true
+        created_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        created_by_username:
+          type: string
+          readOnly: true
+        next_follow_up:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedNotification:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 180
+        message:
+          type: string
+        notification_type:
+          $ref: '#/components/schemas/NotificationTypeEnum'
+        link:
+          type: string
+          maxLength: 500
+        is_read:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        read_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        recipient:
+          type: integer
+          readOnly: true
+    PatchedProduct:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 180
+        sku:
+          type: string
+          nullable: true
+          maxLength: 60
+        description:
+          type: string
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        currency:
+          type: string
+          maxLength: 3
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        created_by:
+          type: integer
+          readOnly: true
+          nullable: true
+    PatchedQuotation:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        quote_number:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          maxLength: 180
+        description:
+          type: string
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        currency:
+          type: string
+          maxLength: 3
+        status:
+          $ref: '#/components/schemas/QuotationStatusEnum'
+        valid_until:
+          type: string
+          format: date
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        lead:
+          type: integer
+          nullable: true
+        customer:
+          type: integer
+          nullable: true
+        created_by:
+          type: integer
+          readOnly: true
+          nullable: true
+    PriorityEnum:
+      enum:
+      - HOT
+      - WARM
+      - COLD
+      type: string
+      description: |-
+        * `HOT` - Hot
+        * `WARM` - Warm
+        * `COLD` - Cold
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 180
+        sku:
+          type: string
+          nullable: true
+          maxLength: 60
+        description:
+          type: string
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        currency:
+          type: string
+          maxLength: 3
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        created_by:
+          type: integer
+          readOnly: true
+          nullable: true
+      required:
+      - created_at
+      - created_by
+      - id
+      - name
+      - updated_at
+    Quotation:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        quote_number:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          maxLength: 180
+        description:
+          type: string
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        currency:
+          type: string
+          maxLength: 3
+        status:
+          $ref: '#/components/schemas/QuotationStatusEnum'
+        valid_until:
+          type: string
+          format: date
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        lead:
+          type: integer
+          nullable: true
+        customer:
+          type: integer
+          nullable: true
+        created_by:
+          type: integer
+          readOnly: true
+          nullable: true
+      required:
+      - created_at
+      - created_by
+      - id
+      - quote_number
+      - title
+      - updated_at
+    QuotationStatusEnum:
+      enum:
+      - DRAFT
+      - SENT
+      - ACCEPTED
+      - REJECTED
+      - EXPIRED
+      type: string
+      description: |-
+        * `DRAFT` - Draft
+        * `SENT` - Sent
+        * `ACCEPTED` - Accepted
+        * `REJECTED` - Rejected
+        * `EXPIRED` - Expired
+    SenderTypeEnum:
+      enum:
+      - LEAD
+      - AGENT
+      - AI
+      - SYSTEM
+      type: string
+      description: |-
+        * `LEAD` - Lead/Customer
+        * `AGENT` - Sales Agent
+        * `AI` - AI Agent
+        * `SYSTEM` - System
+    SourceEnum:
+      enum:
+      - WEBSITE
+      - WHATSAPP
+      - INSTAGRAM
+      - PHONE
+      - EMAIL
+      - MANUAL
+      - OTHER
+      type: string
+      description: |-
+        * `WEBSITE` - Website
+        * `WHATSAPP` - WhatsApp
+        * `INSTAGRAM` - Instagram
+        * `PHONE` - Phone
+        * `EMAIL` - Email
+        * `MANUAL` - Manual
+        * `OTHER` - Other
+    SuggestFollowupRequest:
+      type: object
+      properties:
+        lead_id:
+          type: integer
+        context:
+          type: string
+          default: ''
+          maxLength: 12000
+      required:
+      - lead_id
+    TokenObtainPair:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          readOnly: true
+      required:
+      - access
+      - password
+      - refresh
+      - username
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          writeOnly: true
+      required:
+      - access
+      - refresh
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
