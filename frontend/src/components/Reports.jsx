@@ -99,7 +99,7 @@ function Breakdown({ title, items = [], labelKey, emptyText }) {
                   </span>
 
                   <span className="shrink-0 text-xs tabular-nums text-slate-400">
-                    {number(count)} <span className="text-slate-600">Â·</span>{' '}
+                    {number(count)} <span className="text-slate-600"></span>{' '}
                     {percent.toFixed(0)}%
                   </span>
                 </div>

@@ -1,23 +1,119 @@
 
 import axios from 'axios'
 
+const BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  'http://127.0.0.1:8000/api'
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api',
+  baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 })
 
-api.interceptors.request.use((config) => {
-  const accessToken = localStorage.getItem('access_token')
-
-  if (accessToken) {
-    config.headers.Authorization = `Bearer ${accessToken}`
-  }
-
-  return config
+// Separate Axios instance for refreshing tokens.
+// This prevents the refresh request from triggering its own interceptor.
+const refreshApi = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 })
 
+let refreshPromise = null
+
+// Attach access token to every request.
+api.interceptors.request.use(
+  (config) => {
+    const accessToken = localStorage.getItem('access_token')
+
+    if (accessToken) {
+      config.headers = config.headers || {}
+      config.headers.Authorization = `Bearer ${accessToken}`
+    }
+
+    return config
+  },
+  (error) => Promise.reject(error)
+)
+
+// Automatically refresh expired access tokens.
+api.interceptors.response.use(
+  (response) => response,
+
+  async (error) => {
+    const originalRequest = error.config
+
+    if (
+      error.response?.status !== 401 ||
+      !originalRequest ||
+      originalRequest._retry ||
+      originalRequest.url?.includes('/auth/token/') ||
+      originalRequest.url?.includes('/auth/token/refresh/')
+    ) {
+      return Promise.reject(error)
+    }
+
+    const refreshToken = localStorage.getItem('refresh_token')
+
+    if (!refreshToken) {
+      clearAuthSession()
+      return Promise.reject(error)
+    }
+
+    originalRequest._retry = true
+
+    try {
+      if (!refreshPromise) {
+        refreshPromise = refreshApi
+          .post('/auth/token/refresh/', {
+            refresh: refreshToken,
+          })
+          .then((response) => {
+            const { access, refresh } = response.data
+
+            if (!access) {
+              throw new Error('New access token was not returned.')
+            }
+
+            localStorage.setItem('access_token', access)
+
+            // Save rotated refresh token when backend provides one.
+            if (refresh) {
+              localStorage.setItem('refresh_token', refresh)
+            }
+
+            return access
+          })
+          .finally(() => {
+            refreshPromise = null
+          })
+      }
+
+      const newAccessToken = await refreshPromise
+
+      originalRequest.headers = originalRequest.headers || {}
+      originalRequest.headers.Authorization =
+        `Bearer ${newAccessToken}`
+
+      return api(originalRequest)
+    } catch (refreshError) {
+      clearAuthSession()
+      return Promise.reject(refreshError)
+    }
+  }
+)
+
+// Clear authentication session.
+export function clearAuthSession() {
+  localStorage.removeItem('access_token')
+  localStorage.removeItem('refresh_token')
+
+  window.dispatchEvent(new Event('auth:session-expired'))
+}
+
+// Login.
 export async function loginUser(username, password) {
   const response = await api.post('/auth/token/', {
     username,
@@ -36,8 +132,10 @@ export async function loginUser(username, password) {
   return response.data
 }
 
+// Signup.
 export async function signupUser(userData) {
   const response = await api.post('/auth/signup/', userData)
+
   const { access, refresh } = response.data
 
   if (!access || !refresh) {
@@ -50,27 +148,46 @@ export async function signupUser(userData) {
   return response.data
 }
 
+// Logout.
+export async function logoutUser() {
+  clearAuthSession()
+}
+
+// Password reset.
 export async function requestPasswordReset(email) {
   const response = await api.post('/auth/password-reset/', {
     email: email.trim(),
   })
+
   return response.data
 }
 
-export async function confirmPasswordReset({ uid, token, new_password }) {
+export async function confirmPasswordReset({
+  uid,
+  token,
+  new_password,
+}) {
   const response = await api.post('/auth/password-reset/confirm/', {
     uid,
     token,
     new_password,
   })
+
   return response.data
 }
 
+// Current user.
 export async function getCurrentUser() {
   const response = await api.get('/auth/me/')
   return response.data
 }
 
+export async function updateCurrentUser(data) {
+  const response = await api.patch('/auth/me/', data)
+  return response.data
+}
+
+// Leads.
 export async function getLeads(params = {}) {
   const response = await api.get('/leads/', { params })
   return response.data
@@ -91,10 +208,7 @@ export async function deleteLead(id) {
   return response.data
 }
 
-export default api
-
-
-
+// Follow-ups.
 export async function getFollowUps(params = {}) {
   const response = await api.get('/followups/', { params })
   return response.data
@@ -115,6 +229,7 @@ export async function deleteFollowUp(id) {
   return response.data
 }
 
+// Conversations.
 export async function getConversations(params = {}) {
   const response = await api.get('/conversations/', { params })
   return response.data
@@ -136,10 +251,14 @@ export async function getConversationMessages(id) {
 }
 
 export async function sendConversationMessage(id, data) {
-  const response = await api.post(`/conversations/${id}/messages/`, data)
+  const response = await api.post(
+    `/conversations/${id}/messages/`,
+    data
+  )
   return response.data
 }
 
+// Quotations.
 export async function getQuotations(params = {}) {
   const response = await api.get('/quotations/', { params })
   return response.data
@@ -160,6 +279,7 @@ export async function deleteQuotation(id) {
   return response.data
 }
 
+// Appointments.
 export async function getAppointments(params = {}) {
   const response = await api.get('/appointments/', { params })
   return response.data
@@ -180,19 +300,24 @@ export async function deleteAppointment(id) {
   return response.data
 }
 
-
+// Reports.
 export async function getSalesReport(params = {}) {
   const response = await api.get('/reports/', { params })
   return response.data
 }
 
+// AI.
 export async function scoreLead(lead_id) {
-  const response = await api.post('/ai/score-lead/', { lead_id })
+  const response = await api.post('/ai/score-lead/', {
+    lead_id,
+  })
   return response.data
 }
 
 export async function qualifyLead(lead_id) {
-  const response = await api.post('/ai/qualify-lead/', { lead_id })
+  const response = await api.post('/ai/qualify-lead/', {
+    lead_id,
+  })
   return response.data
 }
 
@@ -209,29 +334,25 @@ export async function suggestAIFollowup(lead_id, context = '') {
   return response.data
 }
 
-
-// Compatibility exports for AIConversations.jsx
+// Compatibility exports for AIConversations.jsx.
 export { generateAIReply as generateReply }
 export { suggestAIFollowup as suggestFollowup }
 
-
-
-
+// AI assistant configuration.
 export async function getAssistantConfiguration() {
   const response = await api.get('/ai/assistant/configuration/')
   return response.data
 }
 
 export async function updateAssistantConfiguration(data) {
-  const response = await api.patch('/ai/assistant/configuration/', data)
+  const response = await api.patch(
+    '/ai/assistant/configuration/',
+    data
+  )
   return response.data
 }
 
-export async function updateCurrentUser(data) {
-  const response = await api.patch('/auth/me/', data)
-  return response.data
-}
-
+// User preferences.
 export async function getUserPreferences() {
   const response = await api.get('/auth/preferences/')
   return response.data
@@ -247,16 +368,21 @@ export async function changePassword(data) {
   return response.data
 }
 
+// Business preferences.
 export async function getBusinessPreferences() {
-  const response = await api.get("/auth/business-preferences/");
-  return response.data;
+  const response = await api.get('/auth/business-preferences/')
+  return response.data
 }
 
 export async function updateBusinessPreferences(data) {
-  const response = await api.patch("/auth/business-preferences/", data);
-  return response.data;
+  const response = await api.patch(
+    '/auth/business-preferences/',
+    data
+  )
+  return response.data
 }
 
+// Notifications.
 export async function getNotifications(params = {}) {
   const response = await api.get('/notifications/', { params })
   return response.data
@@ -270,9 +396,15 @@ export async function markNotificationAsRead(id) {
 }
 
 export async function markAllNotificationsAsRead(notifications = []) {
-  const unread = notifications.filter((notification) => !notification.is_read)
+  const unread = notifications.filter(
+    (notification) => !notification.is_read
+  )
 
   return Promise.all(
-    unread.map((notification) => markNotificationAsRead(notification.id))
+    unread.map((notification) =>
+      markNotificationAsRead(notification.id)
+    )
   )
 }
+
+export default api
