@@ -1,5 +1,7 @@
+
 from pathlib import Path
 import os
+from datetime import timedelta
 from dotenv import load_dotenv
 import pymysql
 
@@ -11,6 +13,7 @@ pymysql.install_as_MySQLdb()
 
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-key-change-before-production")
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
+
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
@@ -24,9 +27,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
     "rest_framework",
+    "rest_framework_simplejwt.token_blacklist",
     "corsheaders",
     "drf_spectacular",
+
     "apps.accounts",
     "apps.leads",
     "apps.customers",
@@ -85,10 +91,18 @@ DATABASES = {
 }
 
 AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"
+    },
 ]
 
 LANGUAGE_CODE = "en-us"
@@ -98,16 +112,21 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+AUTH_USER_MODEL = "accounts.User"
+
+# CORS Settings
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
 
+# Django REST Framework
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -115,14 +134,29 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
+# JWT Token Settings
+SIMPLE_JWT = {
+    # Access token expires after 15 minutes
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+
+    # Refresh token remains valid for 30 days
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+
+    # Generate a new refresh token during refresh
+    "ROTATE_REFRESH_TOKENS": True,
+
+    # Invalidate the old refresh token after rotation
+    "BLACKLIST_AFTER_ROTATION": True,
+
+    "AUTH_HEADER_TYPES": ("Bearer",),
+}
+
+# API Documentation
 SPECTACULAR_SETTINGS = {
     "TITLE": "AI Lead Sales Agent API",
     "DESCRIPTION": "Lead management and AI-assisted sales automation API",
     "VERSION": "1.0.0",
 }
-
-AUTH_USER_MODEL = 'accounts.User'
-
 
 # Gmail SMTP - Password Reset Emails
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
@@ -132,4 +166,7 @@ EMAIL_USE_TLS = True
 
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
-DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER)
+DEFAULT_FROM_EMAIL = os.environ.get(
+    "DEFAULT_FROM_EMAIL",
+    EMAIL_HOST_USER
+)

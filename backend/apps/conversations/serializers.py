@@ -3,10 +3,23 @@ from rest_framework import serializers
 from .models import Conversation, Message
 
 class ConversationSerializer(serializers.ModelSerializer):
+    lead_name = serializers.CharField(
+        source="lead.name",
+        read_only=True,
+        allow_null=True
+    )
+
     class Meta:
         model = Conversation
         fields = "__all__"
-        read_only_fields = ("id", "created_by", "started_at", "last_message_at", "created_at", "updated_at")
+        read_only_fields = (
+            "id",
+            "created_by",
+            "started_at",
+            "last_message_at",
+            "created_at",
+            "updated_at",
+        )
 
 class MessageSerializer(serializers.ModelSerializer):
     conversation = serializers.PrimaryKeyRelatedField(read_only=True)

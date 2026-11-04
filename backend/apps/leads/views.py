@@ -8,6 +8,7 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from .models import Lead
 from .serializers import LeadSerializer
 from apps.followups.models import FollowUp
+from apps.conversations.models import Conversation, Message
 
 
 def models_Q_created_by_or_assigned_to(user):
@@ -87,8 +88,35 @@ class LeadListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         lead = serializer.save(created_by=self.request.user)
-        schedule_automated_followups(lead, self.request.user)
 
+        conversation = Conversation.objects.create(
+            channel=Conversation.Channel.WHATSAPP,
+            status=Conversation.Status.OPEN,
+            subject=f"Conversation with {lead.name}",
+            external_contact=lead.phone,
+            lead=lead,
+            created_by=self.request.user,
+        )
+
+        welcome_message = (
+            f"Hi {lead.name}, hope you're doing well! 😊\n\n"
+            "I'm reaching out regarding your enquiry. "
+            "Could you please let me know what you're looking for "
+            "and how we can help you?"
+        )
+
+        Message.objects.create(
+            conversation=conversation,
+            sender_type=Message.SenderType.AI,
+            direction=Message.Direction.OUTBOUND,
+            body=welcome_message,
+            metadata={"type": "welcome_message"},
+        )
+
+        conversation.last_message_at = timezone.now()
+        conversation.save(update_fields=["last_message_at", "updated_at"])
+
+        schedule_automated_followups(lead, self.request.user)
 
 class LeadDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = LeadSerializer
